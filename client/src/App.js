@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
+import ColorList from './components/ColorList'
 import { PrivateRoute } from './utils/PrivateRoute'
 import BubblePage from './components/BubblePage'
 import Login from "./components/Login";
