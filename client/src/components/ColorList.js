@@ -27,7 +27,7 @@ const ColorList = ({ colors, updateColors }) => {
     // where is is saved right now?
     axiosWithAuth().put(`/api/colors/${id}`, colorToEdit)
     .then(res => {
-      console.log(res.data.color)
+      console.log(res)
       updateColors(colors.map(color => 
         color.id === res.data.id ? res.data : color
       ))
@@ -35,19 +35,20 @@ const ColorList = ({ colors, updateColors }) => {
     .catch(err => console.log(err))
   };
 
-  const deleteColor = colors => {
+  const deleteColor = (color) => {
     // make a delete request to delete this color
-    axiosWithAuth()
-    .delete(`/api/colors/${id}`)
+    axiosWithAuth().delete(`/api/colors/${color.id}`)
     .then(res => {
       console.log(res)
-      console.log(colors)
-      const newColorList = colors.filter(color => {
-        return `${color.id} !== id`
-      })
-      updateColors(newColorList)
+      updateColors(colors.filter(item => color.id !== item.id))
+      // const newColors = colors.filter(color => {
+      //   return color.id !== res.data
+      // })
+      // updateColors(newColors)
     })
-  };
+    .catch(err => console.log(err))
+  }
+  ;
 
   return (
     <div className="colors-wrap">
@@ -56,11 +57,8 @@ const ColorList = ({ colors, updateColors }) => {
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
-              <span className="delete" onClick={e => {
-                    e.stopPropagation();
-                    deleteColor(color)
-                  }
-                }>
+              <span className="delete" 
+              onClick={() => {deleteColor(color)}}>
                   x
               </span>{" "}
               {color.color}
