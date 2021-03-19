@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useHistory, useParams } from 'react-router-dom'
+import { axiosWithAuth } from '../utils/axiosWithAuth'
 
 const initialColor = {
   color: "",
@@ -7,25 +9,46 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const { id } = useParams()
 
   const editColor = color => {
     setEditing(true);
     setColorToEdit(color);
   };
 
+ 
+
   const saveEdit = e => {
     e.preventDefault();
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
+    axiosWithAuth().put(`/api/colors/${id}`, colorToEdit)
+    .then(res => {
+      console.log(res)
+      updateColors(colors.map(color => 
+        color.id === res.data.id ? res.data : color
+      ))
+    })
+    .catch(err => console.log(err))
   };
 
-  const deleteColor = color => {
+  const deleteColor = (color) => {
     // make a delete request to delete this color
-  };
+    axiosWithAuth().delete(`/api/colors/${color.id}`)
+    .then(res => {
+      console.log(res)
+      updateColors(colors.filter(item => color.id !== item.id))
+      // const newColors = colors.filter(color => {
+      //   return color.id !== res.data
+      // })
+      // updateColors(newColors)
+    })
+    .catch(err => console.log(err))
+  }
+  ;
 
   return (
     <div className="colors-wrap">
@@ -34,11 +57,8 @@ const ColorList = ({ colors, updateColors }) => {
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
-              <span className="delete" onClick={e => {
-                    e.stopPropagation();
-                    deleteColor(color)
-                  }
-                }>
+              <span className="delete" 
+              onClick={() => {deleteColor(color)}}>
                   x
               </span>{" "}
               {color.color}
